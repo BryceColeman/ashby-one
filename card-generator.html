@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ashby ONE · Card Generator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple:      #6358f5;
+      --purple-light:#8b83f7;
+      --navy:        #12103a;
+      --bg:          #ffffff;
+      --text-muted:  #12103a;
+    }
+
+    body {
+      font-family: TTNormsPro, -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      background: var(--bg);
+      color: var(--navy);
+      min-height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 72px 24px 48px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--purple);
+      margin-bottom: 16px;
+    }
+
+    header h1 {
+      font-size: 40px;
+      font-weight: 840;
+      font-stretch: 125%;
+      line-height: 1.2;
+      letter-spacing: -1.6px;
+      text-transform: uppercase;
+      color: rgb(14, 12, 41);
+      margin-bottom: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header p {
+      font-size: 1rem;
+      color: rgba(18,16,58,.6);
+      max-width: 420px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 48px;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 40px 96px;
+      align-items: start;
+    }
+
+    @media (max-width: 700px) {
+      .layout {
+        grid-template-columns: 1fr;
+        padding: 0 20px 64px;
+      }
+    }
+
+    /* ── Form ── */
+    .form-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: rgba(18,16,58,.5);
+    }
+
+    input[type="text"],
+    input[type="url"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid rgba(99,88,245,.2);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--navy);
+      outline: none;
+      transition: border-color .15s;
+    }
+
+    input:focus {
+      border-color: var(--purple);
+    }
+
+    .hint {
+      font-size: 11px;
+      color: rgba(18,16,58,.4);
+    }
+
+    /* ── Preview ── */
+    .preview-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      position: sticky;
+      top: 32px;
+    }
+
+    .preview-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: rgba(18,16,58,.4);
+      align-self: flex-start;
+    }
+
+    /* Card preview — mirrors lookbook card */
+    .card-preview {
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .photo {
+      width: 100%;
+      aspect-ratio: 1 / 1.2;
+      border-radius: 20px;
+      overflow: hidden;
+      background-color: rgba(99,88,245,.08);
+      background-image: var(--img);
+      background-size: cover;
+      background-position: 50% 50%;
+      background-repeat: no-repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(99,88,245,.3);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 12px 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .card-name {
+      font-size: .875rem;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.4;
+    }
+
+    .card-company {
+      font-size: .875rem;
+      font-weight: 400;
+      color: var(--purple);
+      line-height: 1.4;
+    }
+
+    .card-title {
+      font-size: .875rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .card-name.empty,
+    .card-company.empty,
+    .card-title.empty {
+      color: rgba(18,16,58,.2);
+    }
+
+    /* ── Copy button ── */
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--purple);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity .15s;
+      align-self: flex-start;
+    }
+
+    .copy-btn:hover { opacity: .85; }
+
+    .copy-btn.copied {
+      background: #22c55e;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 40px 24px 56px;
+      border-top: 1px solid rgba(99,88,245,.12);
+      font-size: .875rem;
+      color: var(--text-muted);
+    }
+
+    footer a { color: var(--purple); }
+  </style>
+</head>
+<body>
+
+<header>
+  <span class="eyebrow">San Francisco · May 7, 2026</span>
+  <h1>Card<br>Generator</h1>
+  <p>Build an attendee card to add to the lookbook. Fill in the details and copy the snippet.</p>
+</header>
+
+<div class="layout">
+  <div class="form-section">
+    <div class="field">
+      <label for="inp-name">Full Name</label>
+      <input id="inp-name" type="text" placeholder="Alex Rivera" />
+    </div>
+    <div class="field">
+      <label for="inp-title">Job Title</label>
+      <input id="inp-title" type="text" placeholder="VP of Talent Acquisition" />
+    </div>
+    <div class="field">
+      <label for="inp-company">Company</label>
+      <input id="inp-company" type="text" placeholder="Acme Corp" />
+    </div>
+    <div class="field">
+      <label for="inp-linkedin">LinkedIn URL</label>
+      <input id="inp-linkedin" type="url" placeholder="https://linkedin.com/in/username" />
+    </div>
+    <div class="field">
+      <label for="inp-image">Photo URL</label>
+      <input id="inp-image" type="url" placeholder="https://..." />
+      <span class="hint">Direct link to a square or portrait photo</span>
+    </div>
+  </div>
+
+  <div class="preview-section">
+    <span class="preview-label">Live Preview</span>
+    <div class="card-preview">
+      <div class="photo" id="preview-photo">No photo</div>
+      <div class="card-body">
+        <div class="card-name empty" id="preview-name">Full Name</div>
+        <div class="card-company empty" id="preview-company">Company</div>
+        <div class="card-title empty" id="preview-title">Job Title</div>
+      </div>
+    </div>
+    <button class="copy-btn" id="copy-btn" onclick="copySnippet()">Copy attendee snippet</button>
+    <div id="snippet-output" style="display:none;width:100%;background:rgba(99,88,245,.06);border-radius:10px;padding:14px;font-size:12px;font-family:monospace;color:var(--navy);white-space:pre-wrap;word-break:break-all;"></div>
+  </div>
+</div>
+
+<footer>
+  <p>Questions? Reach out to <a href="mailto:events@ashbyhq.com">events@ashbyhq.com</a></p>
+</footer>
+
+<script>
+  const fields = {
+    name:     document.getElementById('inp-name'),
+    title:    document.getElementById('inp-title'),
+    company:  document.getElementById('inp-company'),
+    linkedin: document.getElementById('inp-linkedin'),
+    image:    document.getElementById('inp-image'),
+  };
+
+  const previewPhoto   = document.getElementById('preview-photo');
+  const previewName    = document.getElementById('preview-name');
+  const previewCompany = document.getElementById('preview-company');
+  const previewTitle   = document.getElementById('preview-title');
+
+  function update() {
+    const name    = fields.name.value.trim();
+    const title   = fields.title.value.trim();
+    const company = fields.company.value.trim();
+    const image   = fields.image.value.trim();
+
+    previewName.textContent    = name    || 'Full Name';
+    previewCompany.textContent = company || 'Company';
+    previewTitle.textContent   = title   || 'Job Title';
+
+    previewName.classList.toggle('empty',    !name);
+    previewCompany.classList.toggle('empty', !company);
+    previewTitle.classList.toggle('empty',   !title);
+
+    if (image) {
+      previewPhoto.style.setProperty('--img', `url('${image}')`);
+      previewPhoto.textContent = '';
+    } else {
+      previewPhoto.style.removeProperty('--img');
+      previewPhoto.textContent = 'No photo';
+    }
+  }
+
+  Object.values(fields).forEach(el => el.addEventListener('input', update));
+
+  function copySnippet() {
+    const name     = fields.name.value.trim();
+    const title    = fields.title.value.trim();
+    const company  = fields.company.value.trim();
+    const linkedin = fields.linkedin.value.trim();
+    const image    = fields.image.value.trim();
+
+    const snippet = `    {\n      name:     "${name}",\n      title:    "${title}",\n      company:  "${company}",\n      linkedin: "${linkedin}",\n      image:    "${image}",\n    },`;
+
+    navigator.clipboard.writeText(snippet).catch(() => {});
+
+    const out = document.getElementById('snippet-output');
+    out.style.display = 'block';
+    out.textContent = snippet;
+
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'Copy attendee snippet';
+      btn.classList.remove('copied');
+    }, 2000);
+  }
+</script>
+
+</body>
+</html>
