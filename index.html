@@ -3,79 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ashby ONE · Event Hub</title>
+  <title>Ashby ONE</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --purple:      #6358f5;
-      --purple-light:#8b83f7;
-      --navy:        #12103a;
-      --bg:          #ffffff;
-      --nav-height:  64px;
+      --purple: #6358f5;
+      --navy:   #12103a;
     }
 
     body {
       font-family: TTNormsPro, -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      background: var(--bg);
+      background: #ffffff;
       color: var(--navy);
       height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ── Top nav ── */
-    nav {
-      height: var(--nav-height);
-      display: flex;
-      align-items: center;
-      padding: 0 32px;
-      border-bottom: 1px solid rgba(99,88,245,.12);
-      gap: 32px;
-      flex-shrink: 0;
-    }
-
-    .nav-brand {
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      color: var(--navy);
-      text-decoration: none;
-      margin-right: auto;
-    }
-
-    .nav-brand span {
-      color: var(--purple);
-    }
-
-    .nav-link {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--navy);
-      text-decoration: none;
-      padding: 6px 14px;
-      border-radius: 8px;
-      transition: background .15s, color .15s;
-      cursor: pointer;
-      background: none;
-      border: none;
-      font-family: inherit;
-    }
-
-    .nav-link:hover {
-      background: rgba(99,88,245,.08);
-      color: var(--purple);
-    }
-
-    .nav-link.active {
-      background: rgba(99,88,245,.12);
-      color: var(--purple);
-    }
-
-    /* ── Hero (shown when no iframe) ── */
-    .hero {
-      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -94,7 +35,7 @@
       margin-bottom: 16px;
     }
 
-    .hero h1 {
+    h1 {
       font-size: 56px;
       font-weight: 840;
       font-stretch: 125%;
@@ -106,116 +47,17 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    .hero p {
+    p {
       font-size: 1rem;
       color: rgba(18,16,58,.6);
       max-width: 440px;
       line-height: 1.65;
-      margin-bottom: 40px;
-    }
-
-    .hero-links {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      border: none;
-      font-family: inherit;
-      transition: opacity .15s, transform .1s;
-    }
-
-    .btn:hover { opacity: .88; transform: translateY(-1px); }
-
-    .btn-primary {
-      background: var(--purple);
-      color: #fff;
-    }
-
-    .btn-secondary {
-      background: rgba(99,88,245,.1);
-      color: var(--purple);
-    }
-
-    /* ── Iframe wrapper ── */
-    #frame-wrap {
-      flex: 1;
-      display: none;
-    }
-
-    #frame-wrap.visible {
-      display: flex;
-    }
-
-    #frame-wrap iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
     }
   </style>
 </head>
 <body>
-
-<nav>
-  <a class="nav-brand" href="/" onclick="showHome(event)">Ashby <span>ONE</span></a>
-  <button class="nav-link" onclick="loadPage('lookbook.html', this)">Attendee Lookbook</button>
-  <button class="nav-link" onclick="loadPage('card-generator.html', this)">Card Generator</button>
-</nav>
-
-<section class="hero" id="hero">
   <span class="eyebrow">San Francisco · May 7, 2026</span>
   <h1>Ashby<br>ONE</h1>
   <p>The premier gathering for talent leaders. Connect, learn, and build the future of hiring together.</p>
-  <div class="hero-links">
-    <button class="btn btn-primary" onclick="loadPage('lookbook.html', null)">View Attendee Lookbook</button>
-    <button class="btn btn-secondary" onclick="loadPage('card-generator.html', null)">Card Generator</button>
-  </div>
-</section>
-
-<div id="frame-wrap">
-  <iframe id="frame" src="" title="Page content"></iframe>
-</div>
-
-<script>
-  const hero = document.getElementById('hero');
-  const frameWrap = document.getElementById('frame-wrap');
-  const frame = document.getElementById('frame');
-
-  function loadPage(url, triggerEl) {
-    hero.style.display = 'none';
-    frameWrap.classList.add('visible');
-    frame.src = url;
-
-    document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-    if (triggerEl) {
-      triggerEl.classList.add('active');
-    } else {
-      // find matching nav link by url
-      document.querySelectorAll('.nav-link').forEach(el => {
-        if (el.getAttribute('onclick')?.includes(url)) el.classList.add('active');
-      });
-    }
-  }
-
-  function showHome(e) {
-    e.preventDefault();
-    hero.style.display = '';
-    frameWrap.classList.remove('visible');
-    frame.src = '';
-    document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
-  }
-</script>
-
 </body>
 </html>
