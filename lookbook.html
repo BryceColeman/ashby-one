@@ -97,14 +97,59 @@
 
     .photo {
       display: block;
-      width: 100%;
-      aspect-ratio: 1 / 1.2;
-      border-radius: 20px;
-      overflow: hidden;
+    width: 100%;
+    aspect-ratio: 1 / 1.2;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: rgb(128, 128, 128);
+    background-image: radial-gradient(closest-side, rgb(119, 119, 119), rgb(255, 255, 255)),
+        linear-gradient(to right top, rgb(153, 153, 153), rgb(187, 187, 187)),
+        conic-gradient(rgb(136, 136, 136) 0deg, rgb(136, 136, 136) 0deg),
+        var(--img);
+    background-blend-mode: multiply, multiply, screen, luminosity;
+    background-size: 2px 2px, auto, auto, cover;
+    background-position: 0 50%, 0% 0%, 0% 0%, 50% 50%;
+    background-repeat: space, repeat, repeat, repeat;
+    filter: brightness(1.2) contrast(3) url(#halftone-indigo);
+    }
+
+    /* ── Toggle ── */
+    .toggle-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 40px;
+    }
+
+    .toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border: 1.5px solid var(--purple);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--purple);
+      font-family: inherit;
+      font-size: .8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+    }
+
+    .toggle-btn:hover {
+      background: var(--purple);
+      color: #fff;
+    }
+
+    /* Raw mode: strip filter and blend modes */
+    body.raw-mode .photo {
+      filter: none;
+      background-blend-mode: normal;
       background-image: var(--img);
       background-size: cover;
       background-position: 50% 50%;
       background-repeat: no-repeat;
+      background-color: transparent;
     }
 
     /* ── Card body ── */
@@ -152,10 +197,32 @@
 <body>
 
 
+<!-- SVG filter: grayscale → indigo duotone -->
+<svg style="display:none" aria-hidden="true">
+  <defs>
+    <filter id="halftone-indigo" color-interpolation-filters="sRGB">
+      <feColorMatrix type="saturate" values="0" result="gray"/>
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="0.22 1"/>
+        <feFuncG type="table" tableValues="0.20 1"/>
+        <feFuncB type="table" tableValues="0.82 1"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+</svg>
+
 <header>
+  <span class="eyebrow">San Francisco · May 7, 2026</span>
   <h1>Attendee<br>Lookbook</h1>
   <p>Get to know the incredible people joining us at Ashby One—from speakers to fellow attendees. Click through to connect and say hi before the big day!</p>
 </header>
+
+<div class="toggle-wrap">
+  <button class="toggle-btn" id="toggleBtn" onclick="
+    document.body.classList.toggle('raw-mode');
+    this.textContent = document.body.classList.contains('raw-mode') ? '✦ Show styled' : '✦ Show original';
+  ">✦ Show original</button>
+</div>
 
 <main class="grid" id="grid"></main>
 
