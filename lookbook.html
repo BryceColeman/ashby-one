@@ -229,65 +229,106 @@
 
 <script>
   // ── Attendee data ──────────────────────────────────────────
-  // Add / edit entries here. image can be a URL or relative path.
+  // No image field needed. Images live in images/ and are named
+  // after the LinkedIn slug (the part after /in/), e.g.:
+  //   linkedin.com/in/bryce-coleman  →  images/bryce-coleman.jpg
   const attendees = [
     {
-      name:     "Casey Firey",
-      title:    "Global Talent Strategy & Operations",
-      company:  "Zapier",
-      linkedin: "https://www.linkedin.com/in/caseyfirey/",
-      image:    "https://i.pravatar.cc/600?img=8",
+      name:     "Natalia Shreve",
+      title:    "Director of People Ops",
+      company:  "NinjaTech AI",
+      linkedin: "https://www.linkedin.com/in/nshreve/",
     },
     {
-      name:     "Scott Bonneau",
-      title:    "VP of Global Talent",
-      company:  "Shopify",
-      linkedin: "https://www.linkedin.com/in/scottbonneau/",
-      image:    "https://a-us.storyblok.com/f/1017310/960x1016/f6444a1e9b/scott-bonneau-shopify.jpeg",
+      name:     "Darren Bagnall",
+      title:    "Recruiting Operations Consultant",
+      company:  "Essential TA",
+      linkedin: "https://www.linkedin.com/in/dbagnall/",
     },
     {
-      name:     "Jordan Kim",
-      title:    "Director of Talent Acquisition",
-      company:  "Figma",
-      linkedin: "https://www.linkedin.com/in/jordankim/",
-      image:    "https://i.pravatar.cc/600?img=12",
+      name:     "Lucy Winterhalder",
+      title:    "VP of People",
+      company:  "Givebutter",
+      linkedin: "https://www.linkedin.com/in/lucy-winterhalder/",
     },
     {
-      name:     "Morgan Patel",
-      title:    "VP People & Culture",
-      company:  "Linear",
-      linkedin: "https://www.linkedin.com/in/morganpatel/",
-      image:    "https://i.pravatar.cc/600?img=5",
+      name:     "Simone Arnoldy",
+      title:    "Senior Recruiter",
+      company:  "Givebutter",
+      linkedin: "https://www.linkedin.com/in/simone-arnoldy/",
     },
     {
-      name:     "Taylor Nguyen",
-      title:    "Chief People Officer",
-      company:  "Notion",
-      linkedin: "https://www.linkedin.com/in/taylornguyen/",
-      image:    "https://i.pravatar.cc/600?img=47",
+      name:     "Stephanie Heinrich",
+      title:    "Senior Recruiter",
+      company:  "Givebutter",
+      linkedin: "https://www.linkedin.com/in/sheinrich06/",
     },
     {
-      name: "Phil Dunphie",
-      title: "Chief People Officer",
-      company: "Notion",
-      linkedin: "https://www.linkedin.com/in/taylornguyen/",
-      image: "https://i.pravatar.cc/600?img=48",
-    }
+      name:     "Alexandria Brown",
+      title:    "Sr. HRBP",
+      company:  "Givebutter",
+      linkedin: "https://www.linkedin.com/in/alexandriabrownhr/",
+    },
+    {
+      name:     "Alex Lindsey",
+      title:    "Recruiting Operations",
+      company:  "Juniper",
+      linkedin: "https://www.linkedin.com/in/allindsey/",
+    },
+    {
+      name:     "Shannan Farmer",
+      title:    "Lead Talent Partner",
+      company:  "Freshpaint",
+      linkedin: "https://www.linkedin.com/in/shanfarm/",
+    },
+    {
+      name:     "Kevin Kinkor",
+      title:    "CEO",
+      company:  "NextPower.io",
+      linkedin: "https://www.linkedin.com/in/kkinkor/",
+    },
+    {
+      name:     "Danny Choi",
+      title:    "Recruiting Manager",
+      company:  "Parafin",
+      linkedin: "https://www.linkedin.com/in/dannychoi/",
+    },
   ];
   // ──────────────────────────────────────────────────────────
 
+  // Extract the slug from a LinkedIn URL: /in/bryce-coleman/ → bryce-coleman
+  function linkedinSlug(url) {
+    return url.replace(/\/$/, '').split('/in/')[1];
+  }
+
+  attendees.sort((a, b) => a.name.localeCompare(b.name));
 
   const grid = document.getElementById('grid');
 
-  attendees.forEach(({ name, title, company, linkedin, image }) => {
-    const card = document.createElement('a');
+  function resolveImage(slug, callback) {
+    const exts = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif', 'heic'];
+    function tryNext(i) {
+      if (i >= exts.length) { callback(null); return; }
+      const img = new Image();
+      img.onload = () => callback(img.src);
+      img.onerror = () => tryNext(i + 1);
+      img.src = `images/${slug}.${exts[i]}`;
+    }
+    tryNext(0);
+  }
+
+  attendees.forEach(({ name, title, company, linkedin }) => {
+    const slug = linkedin ? linkedinSlug(linkedin) : null;
+    const card = document.createElement(linkedin ? 'a' : 'div');
     card.className = 'card';
-    card.href = linkedin;
-    card.target = '_blank';
-    card.rel = 'noopener noreferrer';
+    if (linkedin) {
+      card.href = linkedin;
+      card.target = '_blank';
+      card.rel = 'noopener noreferrer';
+    }
     card.innerHTML = `
       <div class="photo-wrap">
-        <div class="photo" style="--img: url('${image}')"></div>
+        <div class="photo"></div>
       </div>
       <div class="card-body">
         <div class="card-name">${name}</div>
@@ -296,6 +337,9 @@
       </div>
     `;
     grid.appendChild(card);
+    if (slug) resolveImage(slug, (src) => {
+      if (src) card.querySelector('.photo').style.setProperty('--img', `url('${src}')`);
+    });
   });
 </script>
 
