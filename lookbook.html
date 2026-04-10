@@ -120,33 +120,6 @@
       filter: brightness(1.2) contrast(3) url(#halftone-indigo);
     }
 
-    /* ── Toggle ── */
-    .toggle-wrap {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 40px;
-    }
-
-    .toggle-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 18px;
-      border: 1.5px solid var(--purple);
-      border-radius: 999px;
-      background: transparent;
-      color: var(--purple);
-      font-family: inherit;
-      font-size: .8125rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background .15s, color .15s;
-    }
-
-    .toggle-btn:hover {
-      background: var(--purple);
-      color: #fff;
-    }
 
     /* Raw mode: strip filter and blend modes */
     body.raw-mode .photo {
@@ -245,14 +218,7 @@
       connect and say hi before the big day!</p>
   </header>
 
-  <div class="toggle-wrap">
-    <button class="toggle-btn" id="toggleBtn" onclick="
-    document.body.classList.toggle('raw-mode');
-    this.textContent = document.body.classList.contains('raw-mode') ? '✦ Show styled' : '✦ Show original';
-  ">✦ Show original</button>
-  </div>
-
-  <main class="grid" id="grid"></main>
+<main class="grid" id="grid"></main>
 
 
   <script>
@@ -767,9 +733,17 @@
         photoWrap.classList.remove('reveal-original');
       });
 
-      if (slug) resolveImage(slug, (src) => {
-        if (src) photoWrap.style.setProperty('--img', `url('${src}')`);
-      });
+      if (slug) {
+        resolveImage(slug, (src) => {
+          if (src) {
+            photoWrap.style.setProperty('--img', `url('${src}')`);
+          } else {
+            card.remove();
+          }
+        });
+      } else {
+        card.remove();
+      }
     });
   </script>
 
