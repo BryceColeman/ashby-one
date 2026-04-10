@@ -4,9 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ashby ONE · Attendee Lookbook</title>
+  <title>Ashby ONE · Name Game</title>
   <style>
-    /* ── Reset ── */
     *,
     *::before,
     *::after {
@@ -15,14 +14,14 @@
       padding: 0;
     }
 
-    /* ── Tokens ── */
     :root {
       --purple: #6358f5;
       --purple-light: #8b83f7;
       --navy: #12103a;
       --bg: #ffffff;
       --text-muted: #12103a;
-      --dot-size: 1.5px;
+      --green: #16a34a;
+      --red: #dc2626;
     }
 
     body {
@@ -30,12 +29,12 @@
       background: var(--bg);
       color: var(--navy);
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* ── Header ── */
     header {
       text-align: center;
-      padding: 72px 24px 56px;
+      padding: 56px 24px 24px;
     }
 
     .eyebrow {
@@ -49,206 +48,255 @@
     }
 
     header h1 {
-      font-family: TTNormsPro, -apple-system, "system-ui", "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
       font-size: 40px;
       font-weight: 840;
       font-stretch: 125%;
-      font-style: normal;
-      font-variation-settings: "slnt" 0;
-      line-height: 50px;
+      line-height: 1.1;
       letter-spacing: -1.6px;
       text-transform: uppercase;
       color: rgb(14, 12, 41);
-      margin-bottom: 30px;
-      -webkit-font-smoothing: antialiased;
+      margin-bottom: 16px;
     }
 
-    header p {
-      font-size: 1rem;
-      color: var(--text-muted);
-      max-width: 480px;
+    .score {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .score span {
+      color: var(--purple);
+      font-size: 28px;
+    }
+
+    main {
+      max-width: 720px;
       margin: 0 auto;
-      line-height: 1.6;
-    }
-
-    /* ── Grid ── */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 40px 28px;
-      padding: 0 40px 96px;
-    }
-
-    @media (max-width: 480px) {
-      .grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 24px 12px;
-        padding: 0 16px 64px;
-      }
-    }
-
-    /* ── Card ── */
-    .card {
-      display: flex;
-      flex-direction: column;
-      text-decoration: none;
-      color: inherit;
-      cursor: pointer;
-    }
-
-    /* ── Photo ── */
-    .photo-wrap {
-      width: 100%;
-      position: relative;
+      padding: 0 24px 96px;
     }
 
     .photo {
-      display: block;
-      width: 100%;
-      aspect-ratio: 1 / 1.2;
-      border-radius: 20px;
-      overflow: hidden;
-      background-color: rgb(128, 128, 128);
-      background-image: radial-gradient(closest-side, rgb(119, 119, 119), rgb(255, 255, 255)),
-        linear-gradient(to right top, rgb(153, 153, 153), rgb(187, 187, 187)),
-        conic-gradient(rgb(136, 136, 136) 0deg, rgb(136, 136, 136) 0deg),
-        var(--img);
-      background-blend-mode: multiply, multiply, screen, luminosity;
-      background-size: 2px 2px, auto, auto, cover;
-      background-position: 0 50%, 0% 0%, 0% 0%, 50% 50%;
-      background-repeat: space, repeat, repeat, repeat;
-      filter: brightness(1.2) contrast(3) url(#halftone-indigo);
-    }
-
-
-    /* Raw mode: strip filter and blend modes */
-    body.raw-mode .photo {
-      filter: none;
-      background-blend-mode: normal;
-      background-image: var(--img);
-      background-size: cover;
-      background-position: 50% 50%;
-      background-repeat: no-repeat;
-      background-color: transparent;
-    }
-
-    /* ── Hover-reveal original ── */
-    .photo-original {
-      position: absolute;
-      inset: 0;
-      border-radius: 20px;
-      background-image: var(--img);
-      background-size: cover;
-      background-position: 50% 50%;
-      background-repeat: no-repeat;
-      opacity: 0;
-      transition: opacity 1.2s ease;
-      pointer-events: none;
-    }
-
-    .photo-wrap.reveal-original .photo-original {
-      opacity: 1;
-    }
-
-    /* ── Card body ── */
-    .card-body {
-      padding: 12px 0 0;
-      display: flex;
-      flex-direction: column;
-      gap: 1px;
-    }
-
-    .card-name {
-      font-size: .875rem;
-      font-weight: 700;
-      color: var(--navy);
-      line-height: 1.4;
-    }
-
-    .card-company {
-      font-size: .875rem;
-      font-weight: 400;
-      color: var(--purple);
-      line-height: 1.4;
-    }
-
-    .card-title {
-      font-size: .875rem;
-      font-weight: 400;
-      color: var(--text-muted);
-      line-height: 1.4;
-    }
-
-    /* ── Loader ── */
-    #loader {
-      display: flex;
-      justify-content: center;
-      padding: 80px 0 120px;
-    }
-
-    .spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid rgba(99, 88, 245, .2);
-      border-top-color: var(--purple);
+      width: 280px;
+      height: 280px;
       border-radius: 50%;
-      animation: spin .8s linear infinite;
+      background-size: cover;
+      background-position: center;
+      background-color: #eee;
+      margin: 16px auto 40px;
+      box-shadow: 0 12px 40px rgba(18, 16, 58, 0.12);
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .choices {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
     }
 
-    /* ── Footer ── */
-    footer {
-      text-align: center;
-      padding: 40px 24px 56px;
-      border-top: 1px solid rgba(99, 88, 245, .12);
-      font-size: .875rem;
+    @media (max-width: 560px) {
+      .choices {
+        grid-template-columns: 1fr;
+      }
+
+      .photo {
+        width: 220px;
+        height: 220px;
+      }
+
+      header h1 {
+        font-size: 28px;
+      }
+    }
+
+    .choice {
+      background: #fff;
+      border: 2px solid #e5e5ef;
+      border-radius: 14px;
+      padding: 18px 20px;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      color: var(--navy);
+    }
+
+    .choice:hover:not(:disabled) {
+      border-color: var(--purple);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 88, 245, 0.15);
+    }
+
+    .choice:disabled {
+      cursor: default;
+    }
+
+    .choice.correct {
+      border-color: var(--green);
+      background: #f0fdf4;
+    }
+
+    .choice.wrong {
+      border-color: var(--red);
+      background: #fef2f2;
+    }
+
+    .choice-name {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .choice-meta {
+      font-size: 13px;
       color: var(--text-muted);
+      opacity: 0.75;
     }
 
-    footer a {
-      color: var(--purple);
+    .next {
+      margin-top: 28px;
+      width: 100%;
+      padding: 16px;
+      background: var(--purple);
+      color: #fff;
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .next.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .next:hover {
+      background: var(--purple-light);
+    }
+
+    .loader {
+      text-align: center;
+      padding: 80px 24px;
+      color: var(--text-muted);
+      font-size: 14px;
     }
   </style>
 </head>
 
 <body>
-
-
-  <!-- SVG filter: grayscale → indigo duotone -->
-  <svg style="display:none" aria-hidden="true">
-    <defs>
-      <filter id="halftone-indigo" color-interpolation-filters="sRGB">
-        <feColorMatrix type="saturate" values="0" result="gray" />
-        <feComponentTransfer>
-          <feFuncR type="table" tableValues="0.22 1" />
-          <feFuncG type="table" tableValues="0.20 1" />
-          <feFuncB type="table" tableValues="0.82 1" />
-        </feComponentTransfer>
-      </filter>
-    </defs>
-  </svg>
-
   <header>
-    <span class="eyebrow">San Francisco · May 7, 2026</span>
-    <h1>Attendee<br>Lookbook</h1>
-    <p>Get to know the incredible people joining us at Ashby One—from speakers to fellow attendees. Click through to
-      connect and say hi before the big day!</p>
+    <span class="eyebrow">Ashby ONE</span>
+    <h1>Who's Who?</h1>
+    <div class="score">Score: <span id="score">0</span></div>
   </header>
 
-<div id="loader">
-    <div class="spinner"></div>
-  </div>
-  <main class="grid" id="grid"></main>
-
+  <main>
+    <div id="loader" class="loader">Loading attendees…</div>
+    <div id="game" style="display:none;">
+      <div class="photo" id="photo"></div>
+      <div class="choices" id="choices"></div>
+      <button class="next" id="next">Next →</button>
+    </div>
+  </main>
 
   <script>
-    // ── Attendee data ──────────────────────────────────────────
-    // No image field needed. Images live in images/ and are named
-    // after the LinkedIn slug (the part after /in/), e.g.:
-    //   linkedin.com/in/bryce-coleman  →  images/bryce-coleman.jpg
+    let score = 0;
+    let pool = [];
+    let current = null;
+
+    const scoreEl = document.getElementById('score');
+    const photoEl = document.getElementById('photo');
+    const choicesEl = document.getElementById('choices');
+    const nextBtn = document.getElementById('next');
+    const loaderEl = document.getElementById('loader');
+    const gameEl = document.getElementById('game');
+
+    function linkedinSlug(url) {
+      return url.replace(/\/$/, '').split('/in/')[1];
+    }
+
+    function resolveImage(slug) {
+      const exts = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif', 'heic'];
+      return new Promise((resolve) => {
+        function tryNext(i) {
+          if (i >= exts.length) { resolve(null); return; }
+          const img = new Image();
+          img.onload = () => resolve(img.src);
+          img.onerror = () => tryNext(i + 1);
+          img.src = `images/${slug}.${exts[i]}`;
+        }
+        tryNext(0);
+      });
+    }
+
+    function shuffle(arr) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function pickRandom(arr, n, exclude) {
+      const pool = arr.filter(x => x !== exclude);
+      return shuffle(pool).slice(0, n);
+    }
+
+    function updateScore(delta) {
+      score = Math.max(0, score + delta);
+      scoreEl.textContent = score;
+    }
+
+    function newRound() {
+      nextBtn.classList.remove('show');
+      const correct = pool[Math.floor(Math.random() * pool.length)];
+      current = correct;
+      const distractors = pickRandom(pool, 3, correct);
+      const options = shuffle([correct, ...distractors]);
+
+      photoEl.style.backgroundImage = `url('${correct.src}')`;
+      choicesEl.innerHTML = '';
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'choice';
+        btn.innerHTML = `
+          <div class="choice-name">${opt.name}</div>
+          <div class="choice-meta">${opt.title} · ${opt.company}</div>
+        `;
+        btn.addEventListener('click', () => handleChoice(btn, opt, correct));
+        choicesEl.appendChild(btn);
+      });
+    }
+
+    function handleChoice(btn, chosen, correct) {
+      const allBtns = choicesEl.querySelectorAll('.choice');
+      allBtns.forEach(b => b.disabled = true);
+
+      if (chosen === correct) {
+        btn.classList.add('correct');
+        updateScore(1);
+      } else {
+        btn.classList.add('wrong');
+        updateScore(-1);
+        allBtns.forEach(b => {
+          if (b.querySelector('.choice-name').textContent === correct.name) {
+            b.classList.add('correct');
+          }
+        });
+      }
+
+      nextBtn.classList.add('show');
+    }
+
+    nextBtn.addEventListener('click', newRound);
+
     const attendees = [{
         "name": "Daniel Garcia",
         "title": "People Intelligence Analyst",
@@ -2866,79 +2914,24 @@
           "company": "CodeSignal",
           "linkedin": "https://www.linkedin.com/in/katieburke47/"
         }];
-    // ──────────────────────────────────────────────────────────
 
-    // Extract the slug from a LinkedIn URL: /in/bryce-coleman/ → bryce-coleman
-    function linkedinSlug(url) {
-      return url.replace(/\/$/, '').split('/in/')[1];
-    }
-
-    attendees.sort((a, b) => a.name.localeCompare(b.name));
-
-    const grid = document.getElementById('grid');
-
-    function resolveImage(slug) {
-      const exts = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif', 'heic'];
-      return new Promise((resolve) => {
-        function tryNext(i) {
-          if (i >= exts.length) { resolve(null); return; }
-          const img = new Image();
-          img.onload = () => resolve(img.src);
-          img.onerror = () => tryNext(i + 1);
-          img.src = `images/${slug}.${exts[i]}`;
-        }
-        tryNext(0);
-      });
-    }
-
-    const promises = attendees.map(({ name, title, company, linkedin }) => {
-      const slug = linkedin ? linkedinSlug(linkedin) : null;
+    const promises = attendees.map(a => {
+      const slug = a.linkedin ? linkedinSlug(a.linkedin) : null;
       if (!slug) return Promise.resolve(null);
-      return resolveImage(slug).then(src => src ? { name, title, company, linkedin, src } : null);
+      return resolveImage(slug).then(src => src ? { ...a, src } : null);
     });
 
     Promise.all(promises).then(results => {
-      document.getElementById('loader').remove();
-
-      results.forEach(result => {
-        if (!result) return;
-        const { name, title, company, linkedin, src } = result;
-        const card = document.createElement('a');
-        card.className = 'card';
-        card.href = linkedin;
-        card.target = '_blank';
-        card.rel = 'noopener noreferrer';
-        card.innerHTML = `
-        <div class="photo-wrap">
-          <div class="photo"></div>
-          <div class="photo-original"></div>
-        </div>
-        <div class="card-body">
-          <div class="card-name">${name}</div>
-          <div class="card-company">${company}</div>
-          <div class="card-title">${title}</div>
-        </div>
-      `;
-        grid.appendChild(card);
-
-        const photoWrap = card.querySelector('.photo-wrap');
-        const imgUrl = `url('${src}')`;
-        card.querySelector('.photo').style.setProperty('--img', imgUrl);
-        card.querySelector('.photo-original').style.setProperty('--img', imgUrl);
-
-        let hoverTimer = null;
-        photoWrap.addEventListener('mouseenter', () => {
-          hoverTimer = setTimeout(() => photoWrap.classList.add('reveal-original'), 1000);
-        });
-        photoWrap.addEventListener('mouseleave', () => {
-          clearTimeout(hoverTimer);
-          hoverTimer = null;
-          photoWrap.classList.remove('reveal-original');
-        });
-      });
+      pool = results.filter(Boolean);
+      if (pool.length < 4) {
+        loaderEl.textContent = 'Not enough attendees with photos to play.';
+        return;
+      }
+      loaderEl.style.display = 'none';
+      gameEl.style.display = 'block';
+      newRound();
     });
   </script>
-
 </body>
 
 </html>
