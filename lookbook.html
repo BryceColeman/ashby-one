@@ -179,6 +179,26 @@
       line-height: 1.4;
     }
 
+    /* ── Loader ── */
+    #loader {
+      display: flex;
+      justify-content: center;
+      padding: 80px 0 120px;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(99, 88, 245, .2);
+      border-top-color: var(--purple);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     /* ── Footer ── */
     footer {
       text-align: center;
@@ -218,7 +238,10 @@
       connect and say hi before the big day!</p>
   </header>
 
-<main class="grid" id="grid"></main>
+<div id="loader">
+    <div class="spinner"></div>
+  </div>
+  <main class="grid" id="grid"></main>
 
 
   <script>
@@ -2854,66 +2877,63 @@
 
     const grid = document.getElementById('grid');
 
-    function resolveImage(slug, callback) {
+    function resolveImage(slug) {
       const exts = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif', 'heic'];
-      function tryNext(i) {
-        if (i >= exts.length) { callback(null); return; }
-        const img = new Image();
-        img.onload = () => callback(img.src);
-        img.onerror = () => tryNext(i + 1);
-        img.src = `images/${slug}.${exts[i]}`;
-      }
-      tryNext(0);
+      return new Promise((resolve) => {
+        function tryNext(i) {
+          if (i >= exts.length) { resolve(null); return; }
+          const img = new Image();
+          img.onload = () => resolve(img.src);
+          img.onerror = () => tryNext(i + 1);
+          img.src = `images/${slug}.${exts[i]}`;
+        }
+        tryNext(0);
+      });
     }
 
-    attendees.forEach(({ name, title, company, linkedin }) => {
+    const promises = attendees.map(({ name, title, company, linkedin }) => {
       const slug = linkedin ? linkedinSlug(linkedin) : null;
-      const card = document.createElement(linkedin ? 'a' : 'div');
-      card.className = 'card';
-      if (linkedin) {
+      if (!slug) return Promise.resolve(null);
+      return resolveImage(slug).then(src => src ? { name, title, company, linkedin, src } : null);
+    });
+
+    Promise.all(promises).then(results => {
+      document.getElementById('loader').remove();
+
+      results.forEach(result => {
+        if (!result) return;
+        const { name, title, company, linkedin, src } = result;
+        const card = document.createElement('a');
+        card.className = 'card';
         card.href = linkedin;
         card.target = '_blank';
         card.rel = 'noopener noreferrer';
-      }
-      card.innerHTML = `
-      <div class="photo-wrap">
-        <div class="photo"></div>
-        <div class="photo-original"></div>
-      </div>
-      <div class="card-body">
-        <div class="card-name">${name}</div>
-        <div class="card-company">${company}</div>
-        <div class="card-title">${title}</div>
-      </div>
-    `;
-      grid.appendChild(card);
+        card.innerHTML = `
+        <div class="photo-wrap">
+          <div class="photo"></div>
+          <div class="photo-original"></div>
+        </div>
+        <div class="card-body">
+          <div class="card-name">${name}</div>
+          <div class="card-company">${company}</div>
+          <div class="card-title">${title}</div>
+        </div>
+      `;
+        grid.appendChild(card);
 
-      const photoWrap = card.querySelector('.photo-wrap');
-      let hoverTimer = null;
+        const photoWrap = card.querySelector('.photo-wrap');
+        photoWrap.style.setProperty('--img', `url('${src}')`);
 
-      photoWrap.addEventListener('mouseenter', () => {
-        hoverTimer = setTimeout(() => {
-          photoWrap.classList.add('reveal-original');
-        }, 500);
-      });
-
-      photoWrap.addEventListener('mouseleave', () => {
-        clearTimeout(hoverTimer);
-        hoverTimer = null;
-        photoWrap.classList.remove('reveal-original');
-      });
-
-      if (slug) {
-        resolveImage(slug, (src) => {
-          if (src) {
-            photoWrap.style.setProperty('--img', `url('${src}')`);
-          } else {
-            card.remove();
-          }
+        let hoverTimer = null;
+        photoWrap.addEventListener('mouseenter', () => {
+          hoverTimer = setTimeout(() => photoWrap.classList.add('reveal-original'), 1000);
         });
-      } else {
-        card.remove();
-      }
+        photoWrap.addEventListener('mouseleave', () => {
+          clearTimeout(hoverTimer);
+          hoverTimer = null;
+          photoWrap.classList.remove('reveal-original');
+        });
+      });
     });
   </script>
 
