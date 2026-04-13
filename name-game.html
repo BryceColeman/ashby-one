@@ -221,7 +221,7 @@
     }
 
     function resolveImage(slug) {
-      const exts = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif', 'heic'];
+      const exts = ['jpg', 'jpeg', 'png'];
       return new Promise((resolve) => {
         function tryNext(i) {
           if (i >= exts.length) { resolve(null); return; }

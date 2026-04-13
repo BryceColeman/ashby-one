@@ -71,6 +71,85 @@
       line-height: 1.6;
     }
 
+    /* ── Search ── */
+    .search-wrap {
+      max-width: 420px;
+      margin: 28px auto 0;
+      position: relative;
+    }
+
+    .search-wrap svg.search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      color: var(--purple-light);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 44px 12px 44px;
+      font-family: inherit;
+      font-size: 15px;
+      border: 1.5px solid rgba(99, 88, 245, 0.25);
+      border-radius: 12px;
+      outline: none;
+      color: var(--navy);
+      background: #fff;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .search-input::placeholder {
+      color: rgba(99, 88, 245, 0.4);
+    }
+
+    .search-input:focus {
+      border-color: var(--purple);
+      box-shadow: 0 0 0 3px rgba(99, 88, 245, 0.1);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 24px;
+      height: 24px;
+      border: none;
+      background: rgba(99, 88, 245, 0.1);
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: var(--purple);
+      font-size: 14px;
+      line-height: 1;
+      transition: background 0.15s ease;
+      padding: 0;
+    }
+
+    .search-clear:hover {
+      background: rgba(99, 88, 245, 0.2);
+    }
+
+    .search-clear.visible {
+      display: flex;
+    }
+
+    .no-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 64px 24px;
+      color: var(--text-muted);
+      opacity: 0.5;
+      font-size: 15px;
+      display: none;
+    }
+
     /* ── Grid ── */
     .grid {
       display: grid;
@@ -236,7 +315,13 @@
     <h1>Attendee<br>Lookbook</h1>
     <p>Get to know the incredible people joining us at Ashby One—from speakers to fellow attendees. Click through to
       connect and say hi before the big day!</p>
+    <div class="search-wrap">
+      <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="search-input" id="search" type="text" placeholder="Search" autocomplete="off" />
+      <button class="search-clear" id="searchClear" aria-label="Clear search">✕</button>
+    </div>
   </header>
+  <div class="no-results" id="noResults">No attendees match your search.</div>
 
 <div id="loader">
     <div class="spinner"></div>
@@ -2878,7 +2963,7 @@
     const grid = document.getElementById('grid');
 
     function resolveImage(slug) {
-      const exts = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif', 'heic'];
+      const exts = ['jpg', 'jpeg', 'png'];
       return new Promise((resolve) => {
         function tryNext(i) {
           if (i >= exts.length) { resolve(null); return; }
@@ -2891,24 +2976,38 @@
       });
     }
 
-    const promises = attendees.map(({ name, title, company, linkedin }) => {
+    document.getElementById('loader').remove();
+
+    const EAGER_COUNT = 20;
+    window.missingProfiles = [];
+    let totalToProcess = attendees.length;
+    let processedCount = 0;
+    let summaryPrinted = false;
+
+    function maybePrintSummary() {
+      if (summaryPrinted) return;
+      if (processedCount < totalToProcess) return;
+      summaryPrinted = true;
+      if (window.missingProfiles.length === 0) return;
+      console.log(
+        `%c${window.missingProfiles.length} attendees missing images (copy list below):`,
+        'font-weight: bold; color: #dc2626; font-size: 14px;'
+      );
+      console.log(window.missingProfiles.join('\n'));
+    }
+
+    // Build a card shell for every attendee up front (preserves alphabetical order)
+    const cardRecords = attendees.map(({ name, title, company, linkedin }) => {
       const slug = linkedin ? linkedinSlug(linkedin) : null;
-      if (!slug) return Promise.resolve(null);
-      return resolveImage(slug).then(src => src ? { name, title, company, linkedin, src } : null);
-    });
 
-    Promise.all(promises).then(results => {
-      document.getElementById('loader').remove();
-
-      results.forEach(result => {
-        if (!result) return;
-        const { name, title, company, linkedin, src } = result;
-        const card = document.createElement('a');
-        card.className = 'card';
+      const card = document.createElement('a');
+      card.className = 'card';
+      if (linkedin) {
         card.href = linkedin;
         card.target = '_blank';
         card.rel = 'noopener noreferrer';
-        card.innerHTML = `
+      }
+      card.innerHTML = `
         <div class="photo-wrap">
           <div class="photo"></div>
           <div class="photo-original"></div>
@@ -2919,12 +3018,40 @@
           <div class="card-title">${title}</div>
         </div>
       `;
-        grid.appendChild(card);
+      grid.appendChild(card);
 
-        const photoWrap = card.querySelector('.photo-wrap');
+      return { card, slug, linkedin, loaded: false };
+    });
+
+    function loadCardImage(record) {
+      if (record.loaded) return;
+      record.loaded = true;
+
+      if (!record.slug) {
+        record.card.remove();
+        processedCount++;
+        maybePrintSummary();
+        return;
+      }
+
+      resolveImage(record.slug).then(src => {
+        processedCount++;
+        if (!src) {
+          if (record.linkedin) {
+            const slug = record.slug;
+            const normalized = `https://www.linkedin.com/in/${slug}/`;
+            window.missingProfiles.push(normalized);
+            console.warn(`Missing image: ${normalized}`);
+          }
+          record.card.remove();
+          maybePrintSummary();
+          return;
+        }
+
+        const photoWrap = record.card.querySelector('.photo-wrap');
         const imgUrl = `url('${src}')`;
-        card.querySelector('.photo').style.setProperty('--img', imgUrl);
-        card.querySelector('.photo-original').style.setProperty('--img', imgUrl);
+        record.card.querySelector('.photo').style.setProperty('--img', imgUrl);
+        record.card.querySelector('.photo-original').style.setProperty('--img', imgUrl);
 
         let hoverTimer = null;
         photoWrap.addEventListener('mouseenter', () => {
@@ -2935,7 +3062,89 @@
           hoverTimer = null;
           photoWrap.classList.remove('reveal-original');
         });
+
+        maybePrintSummary();
       });
+    }
+
+    // Eagerly load the first N cards
+    cardRecords.slice(0, EAGER_COUNT).forEach(loadCardImage);
+
+    // Lazy load the rest as they approach the viewport
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const record = entry.target._record;
+            if (record) {
+              loadCardImage(record);
+              observer.unobserve(entry.target);
+            }
+          }
+        });
+      }, { rootMargin: '600px 0px' });
+
+      cardRecords.slice(EAGER_COUNT).forEach(record => {
+        record.card._record = record;
+        observer.observe(record.card);
+      });
+    } else {
+      // Fallback: just load everything
+      cardRecords.slice(EAGER_COUNT).forEach(loadCardImage);
+    }
+
+    // ── Search ──────────────────────────────────────────────────
+    const searchInput = document.getElementById('search');
+    const searchClear = document.getElementById('searchClear');
+    const noResults = document.getElementById('noResults');
+
+    // Build a lookup of lowercase searchable text per card
+    cardRecords.forEach(record => {
+      const el = record.card;
+      const name = (el.querySelector('.card-name')?.textContent || '').toLowerCase();
+      const company = (el.querySelector('.card-company')?.textContent || '').toLowerCase();
+      const title = (el.querySelector('.card-title')?.textContent || '').toLowerCase();
+      record.searchText = `${name} ${company} ${title}`;
+    });
+
+    let searchTimer = null;
+    searchInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(runSearch, 80);
+    });
+
+    function runSearch() {
+      const raw = searchInput.value.trim().toLowerCase();
+      searchClear.classList.toggle('visible', raw.length > 0);
+
+      if (!raw) {
+        // Show all cards that still exist in the DOM
+        cardRecords.forEach(r => { r.card.style.display = ''; });
+        noResults.style.display = 'none';
+        return;
+      }
+
+      const terms = raw.split(/\s+/);
+      let anyVisible = false;
+
+      cardRecords.forEach(record => {
+        const match = terms.every(t => record.searchText.includes(t));
+        record.card.style.display = match ? '' : 'none';
+        if (match) {
+          anyVisible = true;
+          loadCardImage(record); // ensure image loads for search hits
+        }
+      });
+
+      noResults.style.display = anyVisible ? 'none' : 'block';
+    }
+
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchClear.classList.remove('visible');
+      cardRecords.forEach(r => { r.card.style.display = ''; });
+      noResults.style.display = 'none';
+      searchInput.focus();
     });
   </script>
 
