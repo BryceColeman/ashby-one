@@ -223,6 +223,17 @@
       opacity: 1;
     }
 
+    /* ── Speaker badge ── */
+    .speaker-badge {
+      position: absolute;
+      right: 0%;
+      bottom: 0%;
+      width: 30%;
+      height: auto;
+      pointer-events: none;
+      z-index: 2;
+    }
+
     /* ── Card body ── */
     .card-body {
       padding: 12px 0 0;
@@ -306,7 +317,7 @@
 
   <header>
     <h1>Attendees</h1>
-    <p>Get to know the incredible people joining us at Ashby One—from speakers to fellow attendees. Click through to
+    <p>Get to know the incredible people joining us at Ashby One, from speakers to fellow attendees. Click through to
       connect and say hi before the big day!</p>
     <div class="search-wrap">
       <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -367,6 +378,7 @@
           "name": "Abe Spahn",
           "title": "Sr. Director, People Strategy & Analytics",
           "company": "Renuity",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/abe-spahn-260bb37b/"
         },
         {
@@ -457,6 +469,7 @@
           "name": "Anita Chandrasekhar",
           "title": "Global Head of Talent Strategy and Operations",
           "company": "Zapier",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/anita-chandrasekhar/"
         },
         {
@@ -523,18 +536,21 @@
           "name": "Katie Beswick",
           "title": "Head of Talent Experience - Product & Tech",
           "company": "Xero",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/beswickatie/"
         },
         {
           "name": "Scott Bonneau",
           "title": "Head of Talent Acquisition",
           "company": "Shopify",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/bonneau/"
         },
         {
           "name": "Brady Donaldson",
           "title": "Head of HR",
           "company": "Superhuman",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/bradydonaldson/"
         },
         {
@@ -613,6 +629,7 @@
           "name": "Casey Firey",
           "title": "Sr. Talent AI Automation Analyst",
           "company": "Zapier",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/casey-firey-23128534/"
         },
         {
@@ -829,6 +846,7 @@
           "name": "Emily Paik",
           "title": "Sr. Recruiter",
           "company": "Kit",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/emilypaik/"
         },
         {
@@ -859,6 +877,7 @@
           "name": "Felicia Menon",
           "title": "Head of Talent Acquisition",
           "company": "Juniper Square",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/felicia-menon-803514128/"
         },
         {
@@ -1069,6 +1088,7 @@
           "name": "Juliet Peniston",
           "title": "Vice President of Global Talent Acquisition",
           "company": "Confluent",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/julietpeniston/"
         },
         {
@@ -1507,6 +1527,7 @@
           "name": "Matt Stephenson",
           "title": "Head of Tech Talent",
           "company": "Bain Capital Ventures",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/mstephenson325/"
         },
         {
@@ -1561,6 +1582,7 @@
           "name": "Jai Bembry",
           "title": "Team Lead, Candidate Experience",
           "company": "Ontra",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/nyaribrothersbembry/"
         },
         {
@@ -1615,6 +1637,7 @@
           "name": "Rachel Lanman",
           "title": "Manager, Recruiting Operations",
           "company": "Intercom",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/rachelsrosen/"
         },
         {
@@ -1807,6 +1830,7 @@
           "name": "Stacey Slater",
           "title": "Director, Global Talent Acquisition",
           "company": "Oyster",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/staceyslater"
         },
         {
@@ -1909,6 +1933,7 @@
           "name": "Tom Chapman",
           "title": "Director, Talent Acquisition",
           "company": "Dave",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/tomchapmanuk1/"
         },
         {
@@ -2695,6 +2720,7 @@
           "name": "Kenny Mendes",
           "title": "Chief People Officer",
           "company": "Superhuman",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/kennymendes/"
         },
         {
@@ -2790,7 +2816,8 @@
         {
           "name": "Tim Chattaway",
           "title": "Director of Talent Acquisition",
-          "company": "Sony Sports",
+          "company": "Sony Sports Technology",
+          "speaker": true,
           "linkedin": "https://www.linkedin.com/in/timchat/"
         },
         {
@@ -2990,7 +3017,7 @@
     }
 
     // Build a card shell for every attendee up front (preserves alphabetical order)
-    const cardRecords = attendees.map(({ name, title, company, linkedin }) => {
+    const cardRecords = attendees.map(({ name, title, company, linkedin, speaker }) => {
       const slug = linkedin ? linkedinSlug(linkedin) : null;
 
       const card = document.createElement('a');
@@ -3004,6 +3031,7 @@
         <div class="photo-wrap">
           <div class="photo"></div>
           <div class="photo-original"></div>
+          ${speaker ? '<img class="speaker-badge" src="images/speaker-badge.png" alt="Speaker" />' : ''}
         </div>
         <div class="card-body">
           <div class="card-name">${name}</div>
