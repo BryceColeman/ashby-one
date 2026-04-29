@@ -3231,34 +3231,29 @@
         record.card.querySelector('.photo-original').style.setProperty('--img', imgUrl);
 
         let hoverTimer = null;
+        let autoRevertTimer = null;
         photoWrap.addEventListener('mouseenter', () => {
-          hoverTimer = setTimeout(() => photoWrap.classList.add('reveal-original'), 1000);
+          hoverTimer = setTimeout(() => {
+            photoWrap.classList.add('reveal-original');
+            // Auto-revert after 5s so a stuck mobile/WebView hover state
+            // (e.g. user tapped, opened LinkedIn, came back) doesn't persist.
+            clearTimeout(autoRevertTimer);
+            autoRevertTimer = setTimeout(() => {
+              photoWrap.classList.remove('reveal-original');
+            }, 5000);
+          }, 1000);
         });
         photoWrap.addEventListener('mouseleave', () => {
           clearTimeout(hoverTimer);
+          clearTimeout(autoRevertTimer);
           hoverTimer = null;
+          autoRevertTimer = null;
           photoWrap.classList.remove('reveal-original');
         });
 
         maybePrintSummary();
       });
     }
-
-    // Reset stuck "reveal-original" state when the page becomes visible
-    // again (e.g. user tapped a card, opened LinkedIn, then came back —
-    // mobile WebViews keep the hover state stuck on).
-    let resetRevealTimer = null;
-    function scheduleRevealReset() {
-      clearTimeout(resetRevealTimer);
-      resetRevealTimer = setTimeout(() => {
-        document.querySelectorAll('.photo-wrap.reveal-original')
-          .forEach(el => el.classList.remove('reveal-original'));
-      }, 5000);
-    }
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') scheduleRevealReset();
-    });
-    window.addEventListener('pageshow', scheduleRevealReset);
 
     // Eagerly load the first N cards
     cardRecords.slice(0, EAGER_COUNT).forEach(loadCardImage);
