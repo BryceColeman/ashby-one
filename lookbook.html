@@ -87,7 +87,7 @@
       width: 100%;
       padding: 12px 44px 12px 44px;
       font-family: inherit;
-      font-size: 15px;
+      font-size: 16px;
       border: 1.5px solid rgba(99, 88, 245, 0.25);
       border-radius: 12px;
       outline: none;
@@ -335,9 +335,9 @@
 
   <script>
     // ── Attendee data ──────────────────────────────────────────
-    // No image field needed. Images live in images/ and are named
+    // No image field needed. Images live in images/attendees/ and are named
     // after the LinkedIn slug (the part after /in/), e.g.:
-    //   linkedin.com/in/bryce-coleman  →  images/bryce-coleman.jpg
+    //   linkedin.com/in/bryce-coleman  →  images/attendees/bryce-coleman.jpg
     const attendees = [
         {
           "company": "Form Energy",
@@ -3139,7 +3139,7 @@
           const img = new Image();
           img.onload = () => resolve(img.src);
           img.onerror = () => tryNext(i + 1);
-          img.src = `images/${slug}.${exts[i]}`;
+          img.src = `images/attendees/${slug}.${exts[i]}`;
         }
         tryNext(0);
       });
